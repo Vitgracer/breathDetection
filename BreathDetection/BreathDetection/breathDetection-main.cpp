@@ -21,7 +21,7 @@ int main() {
 	
 	// launch engine to calculate dusparity
 	breathDetection engine;
-	engine._calculateDisparity(imgL, imgR, disparity);
+	engine._calculateDisparity(imgL, imgR, &disparity);
 
 	return 0;
 }
