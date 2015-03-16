@@ -6,3 +6,15 @@
 
 #include <CL/cl.hpp>
 
+class breathDetection {
+public:
+	void _prepareOpenCL();
+
+private:
+	std::vector<cl::Platform> _platforms;
+	std::vector<cl::Device> _devices;
+	cl::Program _program;
+	cl::Context _context;
+	cl::CommandQueue _queue;
+	
+};
