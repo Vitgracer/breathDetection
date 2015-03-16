@@ -9,6 +9,7 @@
 class breathDetection {
 public:
 	void _prepareOpenCL();
+	void _calculateDisparity(cv::Mat imgL, cv::Mat imgR, cv::Mat disparity);
 
 private:
 	// openCL launch variables 
@@ -17,5 +18,4 @@ private:
 	cl::Program _program;
 	cl::Context _context;
 	cl::CommandQueue _queue;
-	
 };

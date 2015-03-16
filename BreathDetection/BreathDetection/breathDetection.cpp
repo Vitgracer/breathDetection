@@ -39,3 +39,9 @@ void breathDetection::_prepareOpenCL() {
 	if (_program.build(_devices, "") == CL_SUCCESS) std::cout << "\nSuccessfully built! " << _program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(default_device) << "\n---------------------------------------------";
 											   else std::cout << "\nErrors!\n----------------------------------------" << _program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(_devices[0]) << "\n";
 }
+
+void breathDetection::_calculateDisparity(cv::Mat imgL, cv::Mat imgR, cv::Mat disparity) {
+	/* func to calculate disparuty using left and right images from stereo-pair */
+
+	_prepareOpenCL();
+}
