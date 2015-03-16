@@ -1,4 +1,4 @@
-/* header file for breatjDetection class */
+/* header file for breathDetection class */
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
@@ -11,6 +11,7 @@ public:
 	void _prepareOpenCL();
 
 private:
+	// openCL launch variables 
 	std::vector<cl::Platform> _platforms;
 	std::vector<cl::Device> _devices;
 	cl::Program _program;
