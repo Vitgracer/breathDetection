@@ -94,7 +94,7 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	// allocate buffer memory for images 
 	cl::Buffer bL = cl::Buffer(_context, CL_MEM_READ_ONLY, sizeof(uchar) * SQUARE * 3);
 	cl::Buffer bR = cl::Buffer(_context, CL_MEM_READ_ONLY, sizeof(uchar) * SQUARE * 3);
-	cl::Buffer bOut(_context, CL_MEM_WRITE_ONLY, sizeof(float)* SQUARE);
+	cl::Buffer bDisp(_context, CL_MEM_WRITE_ONLY, sizeof(float)* SQUARE);
 
 	// allocate buffer memory to store 3D costs 
 	cl::Buffer bCosts(_context, CL_MEM_READ_WRITE, sizeof(float) * SQUARE * DIFF);
@@ -104,4 +104,11 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	_queue.enqueueWriteBuffer(bR, CL_TRUE, 0, sizeof(uchar)* SQUARE * 3, imgR.data);
 
 	_launchKernel("kComputeCosts", WIDTH, HEIGHT, DIFF, 3, bL, bR, bCosts);
+	_launchKernel("kGetDisparityMap", WIDTH, HEIGHT, 2, bCosts, bDisp);
+
+	// read disparity result 
+	std::vector<float> dispData(SQUARE);
+
+	_queue.enqueueReadBuffer(bDisp, CL_TRUE, 0, sizeof(float)* SQUARE, &dispData[0]);
+	cv::Mat(HEIGHT, WIDTH, CV_32FC1, &dispData[0]).copyTo((*disparity));
 }

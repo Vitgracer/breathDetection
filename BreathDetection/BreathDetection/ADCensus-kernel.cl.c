@@ -5,6 +5,7 @@
 #define SQUARE (WIDTH * HEIGHT)
 #define DISP_MAX 100
 #define DISP_MIN 0
+#define DIFF (DISP_MAX - DISP_MIN)
 
 __kernel void kComputeCosts(__global uchar* L,
 						    __global uchar* R,
@@ -29,4 +30,23 @@ __kernel void kComputeCosts(__global uchar* L,
 															abs_diff(pixL.y, pixR.y) +
 															abs_diff(pixL.z, pixR.z)
 															) / 3;
+}
+
+__kernel void kGetDisparityMap(__global float* costs,
+							   __global uchar* disp) {
+/*  find minimal costs values and construct isparity map */
+
+	const int2 xy = (get_global_id(0), get_global_id(1));
+
+	float min = costs[xy.x + xy.y * WIDTH];
+	float minInd = 0;
+
+	// go through z-axis of (x,y) position
+	for (ushort z = 1; z < DIFF; z++) {
+		const value = costs[xy.x + xy.y * WIDTH + z * SQUARE];
+
+		if (value < min) { min = value; ind = z; }
+	}
+
+	disp[xy.x + xy.y * WIDTH] = ind;
 }
