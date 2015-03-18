@@ -1,6 +1,5 @@
 /* organize class for breath detection */
-#include <iostream>
-#include <fstream>
+
 #define WIDTH 640	
 #define HEIGHT 480
 #define SQUARE (WIDTH * HEIGHT)
@@ -8,6 +7,8 @@
 #define DISP_MIN 0
 #define DIFF (DISP_MAX - DISP_MIN)
 
+#include <iostream>
+#include <fstream>
 #include <streambuf>
 #include <vector>
 
