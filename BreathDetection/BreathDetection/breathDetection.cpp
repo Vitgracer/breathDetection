@@ -1,6 +1,12 @@
 /* organize class for breath detection */
 #include <iostream>
 #include <fstream>
+#define WIDTH 640	
+#define HEIGHT 480
+#define DISP_MAX 100
+#define DISP_MIN 0
+#define DIFF (DISP_MAX - DISP_MIN)
+
 #include <streambuf>
 #include <vector>
 
@@ -42,7 +48,6 @@ void breathDetection::_prepareOpenCL() {
 
 void breathDetection::_calculateDisparity(cv::Mat imgL, cv::Mat imgR, cv::Mat* disparity) {
 	/* func to calculate disparity using left and right images from stereo-pair */
-
 	_prepareOpenCL();
 
 
