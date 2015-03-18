@@ -63,7 +63,7 @@ __kernel void kComputeCosts(__global uchar* L,
 						 R[rCoord + 2],
 					     0 };
 
-	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = Census((int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), (int2)(xyz.x, xyz.y), L, R, 0);
+	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 0);
 }
 
 __kernel void kGetDisparityMap(__global float* costs,
