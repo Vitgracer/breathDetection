@@ -15,6 +15,33 @@ float AD(const uint4 l, const uint4 r) {
 		             abs_diff(l.z, r.z) ) / 3;
 }
 
+float Census(const uint2 l, const uint2 r, __global uchar* lImg, __global uchar* rImg, char channel) {
+	/* Census metric */
+
+	const uchar lCenter = 3 * (l.x + l.y * WIDTH) + channel;
+	const uchar rCenter = 3 * (r.x + r.y * WIDTH) + channel;
+	
+	float hamming = 0.0;
+
+	for (char y = -3; y < 4; y++) {
+		for (char x = -4; x < 5; x++) {
+			
+			// if center of the box - skip
+			if (!(x || y)) continue;
+
+			char hamL = 0;
+			char hamR = 0;
+
+			if (lImg[3 * (l.x + x + (l.y + y) * WIDTH) + channel] < lCenter) lHam = 1;
+			if (rImg[3 * (r.x + x + (r.y + y) * WIDTH) + channel] < rCenter) rHam = 1;
+
+			if (rHam != lHam) hamming += 1.0;
+		}
+	}
+
+	return hamming;
+}
+
 __kernel void kComputeCosts(__global uchar* L,
 						    __global uchar* R,
 	                        __global float* costs) {
