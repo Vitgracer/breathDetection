@@ -13,7 +13,7 @@ __kernel void kComputeCosts(__global uchar* L,
 /*  kernel to compute raw-costs with AD-Census metric only wothout 
     aggregation and improvements  */
 
-	const int3 xyz = (get_global_id(0), get_global_id(1), get_global_id(2));
+	const int3 xyz = (int3)(get_global_id(0), get_global_id(1), get_global_id(2));
 	
 	// get the current pixel colour  from left and right images 
 	const uint4 pixL = { L[ 3 * (xyz.x + xyz.y * WIDTH) ], 
