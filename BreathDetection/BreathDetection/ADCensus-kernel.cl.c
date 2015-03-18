@@ -18,8 +18,8 @@ float AD(const uint4 l, const uint4 r) {
 float Census(const int2 l, const int2 r, __global uchar* lImg, __global uchar* rImg, char channel) {
 	/* Census metric */
 
-	const uchar lCenter = 3 * (l.x + l.y * WIDTH) + channel;
-	const uchar rCenter = 3 * (r.x + r.y * WIDTH) + channel;
+	const uchar lCenter = lImg[ 3 * (l.x + l.y * WIDTH) + channel];
+	const uchar rCenter = rImg[ 3 * (r.x + r.y * WIDTH) + channel];
 	
 	float hamming = 0.0;
 
