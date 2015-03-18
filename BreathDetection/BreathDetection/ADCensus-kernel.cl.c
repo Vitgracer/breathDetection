@@ -7,6 +7,15 @@
 #define DISP_MIN 0
 #define DIFF (DISP_MAX - DISP_MIN)
 
+float AD(const uint4 l, const uint4 r) {
+	/* AD metric*/
+
+	return (float) ( abs_diff(l.x, r.x) +
+				     abs_diff(l.y, r.y) +
+		             abs_diff(l.z, r.z)) / 3;
+	               )
+}
+
 __kernel void kComputeCosts(__global uchar* L,
 						    __global uchar* R,
 	                        __global float* costs) {
@@ -26,10 +35,7 @@ __kernel void kComputeCosts(__global uchar* L,
 						 R[3 * (xyz.x + xyz.y * WIDTH - xyz.z - DISP_MIN) + 2],
 					     0 };
 
-	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = (float)(abs_diff(pixL.x, pixR.x) +
-															abs_diff(pixL.y, pixR.y) +
-															abs_diff(pixL.z, pixR.z)
-															) / 3;
+	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = AD(pixL, pixR);
 }
 
 __kernel void kGetDisparityMap(__global float* costs,
