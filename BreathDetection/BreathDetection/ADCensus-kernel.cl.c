@@ -20,9 +20,9 @@ __kernel void kComputeCosts(__global uchar* L,
 						 L[ 3 * (xyz.x + xyz.x * WIDTH) + 2 ], 
 						 0 };
 
-	const uint4 pixR = { R[3 * (xyz.x + xyz.x * WIDTH - xyz.z - _DISPARITY_LEVEL_MIN)],
-						 R[3 * (xyz.x + xyz.x * WIDTH - xyz.z - _DISPARITY_LEVEL_MIN) + 1],
-					     R[3 * (xyz.x + xyz.x * WIDTH - xyz.z - _DISPARITY_LEVEL_MIN) + 2],
+	const uint4 pixR = { R[3 * (xyz.x + xyz.x * WIDTH - xyz.z - DISP_MIN)],
+						 R[3 * (xyz.x + xyz.x * WIDTH - xyz.z - DISP_MIN) + 1],
+						 R[3 * (xyz.x + xyz.x * WIDTH - xyz.z - DISP_MIN) + 2],
 					     0 };
 
 	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = (float)(abs_diff(pixL.x, pixR.x) +
