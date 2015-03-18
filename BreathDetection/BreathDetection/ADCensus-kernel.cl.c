@@ -12,7 +12,7 @@ float AD(const uint4 l, const uint4 r) {
 
 	return (float) ( abs_diff(l.x, r.x) +
 				     abs_diff(l.y, r.y) +
-		             abs_diff(l.z, r.z)) / 3;
+		             abs_diff(l.z, r.z) ) / 3;
 	               )
 }
 
