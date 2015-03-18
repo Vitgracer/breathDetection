@@ -16,9 +16,9 @@ __kernel void kComputeCosts(__global uchar* L,
 	const int3 xyz = (get_global_id(0), get_global_id(1), get_global_id(2));
 	
 	// get the current pixel colour  from left and right images 
-	const uint4 pixL = { L[ 3 * (xyz.x + xyz.x * WIDTH) ], 
-					     L[ 3 * (xyz.x + xyz.x * WIDTH) + 1 ], 
-						 L[ 3 * (xyz.x + xyz.x * WIDTH) + 2 ], 
+	const uint4 pixL = { L[ 3 * (xyz.x + xyz.y * WIDTH) ], 
+					     L[ 3 * (xyz.x + xyz.y * WIDTH) + 1 ], 
+						 L[ 3 * (xyz.x + xyz.y * WIDTH) + 2 ], 
 						 0 };
 
 	const uint4 pixR = { R[3 * (xyz.x + xyz.x * WIDTH - xyz.z - DISP_MIN)],
