@@ -109,8 +109,8 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	cl::Buffer bCosts(_context, CL_MEM_READ_WRITE, sizeof(float) * SQUARE * DIFF);
 
 	// write images in the buffer 
-	_queue.enqueueWriteBuffer(bL, CL_TRUE, 0, sizeof(uchar)* SQUARE * 3, imgL.data);
-	_queue.enqueueWriteBuffer(bR, CL_TRUE, 0, sizeof(uchar)* SQUARE * 3, imgR.data);
+	_queue.enqueueWriteBuffer(bL, CL_TRUE, 0, sizeof(uchar) * SQUARE * 3, imgL.data);
+	_queue.enqueueWriteBuffer(bR, CL_TRUE, 0, sizeof(uchar) * SQUARE * 3, imgR.data);
 
 	_launchKernel("kComputeCosts", WIDTH, HEIGHT, DIFF, 3, bL, bR, bCosts);
 	_launchKernel("kGetDisparityMap", WIDTH, HEIGHT, 2, bCosts, bDisp);
