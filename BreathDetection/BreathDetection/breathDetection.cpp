@@ -63,17 +63,19 @@ void breathDetection::_prepareOpenCL() {
 	/* prepare opencl device to work */
 
 	// get info about platform 
-	cl::Platform::get(&_platforms);
-	cl::Platform defaultPlatform = _platforms[0];
+	std::vector<cl::Platform> allPlatforms;
+	cl::Platform::get(&allPlatforms);
+	cl::Platform defaultPlatform = allPlatforms[0];
 	std::cout << "Using platform: " << defaultPlatform.getInfo<CL_PLATFORM_NAME>();
 
 	// get info about devices 
-	defaultPlatform.getDevices(CL_DEVICE_TYPE_ALL, &_devices);
-	cl::Device default_device = _devices[0];
-	std::cout << "\nDevice: " << default_device.getInfo<CL_DEVICE_NAME>();
+	std::vector<cl::Device> allDevices;
+	defaultPlatform.getDevices(CL_DEVICE_TYPE_ALL, &allDevices);
+	cl::Device defaultDevice = allDevices[0];
+	std::cout << "\nDevice: " << defaultDevice.getInfo<CL_DEVICE_NAME>();
 
 	// organize context 
-	_context = cl::Context(default_device);
+	_context = cl::Context({ defaultDevice });
 	cl::Program::Sources sources;
 
 	// read opencl file with kernels 
@@ -85,8 +87,11 @@ void breathDetection::_prepareOpenCL() {
 	_program = cl::Program(_context, sources);
 
 	// use compiler logs 
-	if (_program.build(_devices, "") == CL_SUCCESS) std::cout << "\nSuccessfully built! " << _program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(default_device) << "\n---------------------------------------------";
-											   else std::cout << "\nErrors!\n----------------------------------------" << _program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(_devices[0]) << "\n";
+	if (_program.build(allDevices, "") == CL_SUCCESS) std::cout << "\nSuccessfully built! " << _program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(defaultDevice) << "\n---------------------------------------------";
+											     else std::cout << "\nErrors!\n----------------------------------------" << _program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(allDevices[0]) << "\n";
+	
+	cl::CommandQueue queue(_context, defaultDevice);
+	_queue = queue;
 }
 
 void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR, cv::Mat* disparity) {
@@ -107,7 +112,7 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	_queue.enqueueWriteBuffer(bL, CL_TRUE, 0, sizeof(uchar)* SQUARE * 3, imgL.data);
 	_queue.enqueueWriteBuffer(bR, CL_TRUE, 0, sizeof(uchar)* SQUARE * 3, imgR.data);
 
-	_launchKernel("kComputeCosts", WIDTH, HEIGHT, DIFF, 3, bL, bR, bCosts);
+	//_launchKernel("kComputeCosts", WIDTH, HEIGHT, DIFF, 3, bL, bR, bCosts);
 	_launchKernel("kGetDisparityMap", WIDTH, HEIGHT, 2, bCosts, bDisp);
 
 	// read disparity result 

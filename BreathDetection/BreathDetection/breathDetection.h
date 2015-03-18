@@ -12,8 +12,6 @@ public:
 
 private:
 	// openCL launch variables 
-	std::vector<cl::Platform> _platforms;
-	std::vector<cl::Device> _devices;
 	cl::Program _program;
 	cl::Context _context;
 	cl::CommandQueue _queue;
