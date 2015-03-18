@@ -11,6 +11,7 @@
 #include <fstream>
 #include <streambuf>
 #include <vector>
+#include <ctime>
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
@@ -112,9 +113,14 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	// write images in the buffer 
 	_queue.enqueueWriteBuffer(bL, CL_TRUE, 0, sizeof(uchar) * SQUARE * 3, imgL.data);
 	_queue.enqueueWriteBuffer(bR, CL_TRUE, 0, sizeof(uchar) * SQUARE * 3, imgR.data);
-
+	
+	std::clock_t timer = std::clock();
 	_launchKernel("kComputeCosts", WIDTH, HEIGHT, DIFF, 3, bL, bR, bCosts);
+	std::cout << "\ncosts computation: " << std::clock() - timer << " ms\n";
+
+	timer = std::clock();
 	_launchKernel("kGetDisparityMap", WIDTH, HEIGHT, 2, bCosts, bDisp);
+	std::cout << "\ndisparity computation: " << std::clock() - timer << " ms\n";
 
 	// read disparity result 
 	std::vector<float> dispData(SQUARE);
