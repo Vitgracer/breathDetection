@@ -36,6 +36,25 @@ void breathDetection::_launchKernel(const char* kernelName, const int width, con
 	_queue.finish();
 }
 
+void breathDetection::_launchKernel(const char* kernelName, const int width, const int height, const int nArgs, ...) {
+	/* funtion to call kernel with current name and width * height  threads */
+
+	// standard procedure to work with variable number of variables 
+	va_list args;
+	va_start(args, nArgs);
+
+	cl::Kernel kernel = cl::Kernel(_program, kernelName);
+
+	// put buffers in the kernel  
+	for (char bufNum = 0; bufNum < nArgs; bufNum++) {
+		kernel.setArg(bufNum, va_arg(args, cl::Buffer));
+	}
+
+	//organize kernel computations 
+	_queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(width, height));
+	_queue.finish();
+}
+
 void breathDetection::_prepareOpenCL() {
 	/* prepare opencl device to work */
 

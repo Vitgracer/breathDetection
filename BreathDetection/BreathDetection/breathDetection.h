@@ -21,5 +21,6 @@ private:
 	void _prepareOpenCL();
 
 	// kernel functions to call 
+	void _launchKernel(const char* kernelName, const int width, const int height, const int nArgs, ...);
 	void _launchKernel(const char* kernelName, const int width, const int height, const int depth, const int nArgs, ...);
 };
