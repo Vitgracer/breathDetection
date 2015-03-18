@@ -13,7 +13,6 @@ float AD(const uint4 l, const uint4 r) {
 	return (float) ( abs_diff(l.x, r.x) +
 				     abs_diff(l.y, r.y) +
 		             abs_diff(l.z, r.z) ) / 3;
-	               )
 }
 
 __kernel void kComputeCosts(__global uchar* L,
@@ -25,14 +24,16 @@ __kernel void kComputeCosts(__global uchar* L,
 	const int3 xyz = (int3)(get_global_id(0), get_global_id(1), get_global_id(2));
 	
 	// get the current pixel colour  from left and right images 
-	const uint4 pixL = { L[ 3 * (xyz.x + xyz.y * WIDTH) ], 
-					     L[ 3 * (xyz.x + xyz.y * WIDTH) + 1 ], 
-						 L[ 3 * (xyz.x + xyz.y * WIDTH) + 2 ], 
+	const uint lCoord = 3 * (xyz.x + xyz.y * WIDTH);
+	const uint4 pixL = { L[lCoord], 
+						 L[lCoord + 1],
+						 L[lCoord + 2],
 						 0 };
 
-	const uint4 pixR = { R[3 * (xyz.x + xyz.y * WIDTH - xyz.z - DISP_MIN)],
-						 R[3 * (xyz.x + xyz.y * WIDTH - xyz.z - DISP_MIN) + 1],
-						 R[3 * (xyz.x + xyz.y * WIDTH - xyz.z - DISP_MIN) + 2],
+	const uint rCoord = 3 * (xyz.x + xyz.y * WIDTH - xyz.z - DISP_MIN);
+	const uint4 pixR = { R[rCoord],
+						 R[rCoord + 1],
+						 R[rCoord + 2],
 					     0 };
 
 	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = AD(pixL, pixR);
