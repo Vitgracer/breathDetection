@@ -43,10 +43,10 @@ __kernel void kGetDisparityMap(__global float* costs,
 
 	// go through z-axis of (x,y) position
 	for (ushort z = 1; z < DIFF; z++) {
-		const value = costs[xy.x + xy.y * WIDTH + z * SQUARE];
+		const float value = costs[xy.x + xy.y * WIDTH + z * SQUARE];
 
-		if (value < min) { min = value; ind = z; }
+		if (value < min) { min = value; minInd = z; }
 	}
 
-	disp[xy.x + xy.y * WIDTH] = ind;
+	disp[xy.x + xy.y * WIDTH] = minInd;
 }
