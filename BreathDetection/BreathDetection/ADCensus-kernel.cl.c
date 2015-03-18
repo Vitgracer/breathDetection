@@ -70,11 +70,15 @@ __kernel void kComputeCosts(__global uchar* L,
 	
 	// get AD and Census result 
 	const float resAD = AD(pixL, pixR);
-	const float resCensus = Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 0) + 
-							Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 1) + 
-						    Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 2);
+	
+	const int2 censusPointL = (int2)(xyz.x, xyz.y);
+	const int2 censusPointR = (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y);
 
-	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = resCensus;
+	const float resCensus = Census(censusPointL, censusPointR, L, R, 0) +
+							Census(censusPointL, censusPointR, L, R, 1) +
+							Census(censusPointL, censusPointR, L, R, 2);
+
+	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = ADCensus(resAD, resCensus);
 }
 
 __kernel void kGetDisparityMap(__global float* costs,
