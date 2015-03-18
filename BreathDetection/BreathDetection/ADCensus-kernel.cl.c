@@ -6,6 +6,8 @@
 #define DISP_MAX 40
 #define DISP_MIN 0
 #define DIFF (DISP_MAX - DISP_MIN)
+#define AD_LAMBD 10
+#define CENSUS_LAMBD 30
 
 float AD(const uint4 l, const uint4 r) {
 	/* AD metric*/
@@ -42,6 +44,12 @@ float Census(const int2 l, const int2 r, __global uchar* lImg, __global uchar* r
 	return hamming;
 }
 
+float ADCensus(float AD, float Census) {
+	/* ADCensus metric */
+	
+	return (1 - exp(-1 * AD / AD_LAMBD) + 1 - exp(-1 * Census / CENSUS_LAMBD) );
+}
+
 __kernel void kComputeCosts(__global uchar* L,
 						    __global uchar* R,
 	                        __global float* costs) {
@@ -62,8 +70,14 @@ __kernel void kComputeCosts(__global uchar* L,
 						 R[rCoord + 1],
 						 R[rCoord + 2],
 					     0 };
+	
+	// get AD and Census result 
+	const float resAD = AD(pixL, pixR);
+	const float resCensus = Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 0) + 
+							Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 1) + 
+						    Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 2);
 
-	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 0);
+	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = ADCensus(resAD, resCensus);
 }
 
 __kernel void kGetDisparityMap(__global float* costs,
