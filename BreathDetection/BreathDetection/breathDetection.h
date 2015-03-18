@@ -8,7 +8,7 @@
 
 class breathDetection {
 public:
-	void _calculateDisparity(cv::Mat imgL, cv::Mat imgR, cv::Mat* disparity);
+	void _calculateDisparity(const cv::Mat imgL, const cv::Mat imgR, cv::Mat* disparity);
 
 private:
 	// openCL launch variables 
