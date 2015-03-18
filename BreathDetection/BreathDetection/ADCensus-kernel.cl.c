@@ -31,13 +31,10 @@ float Census(const int2 l, const int2 r, __global uchar* lImg, __global uchar* r
 			// if center of the box - skip
 			if (!(x || y)) continue;
 
-			char lHam = 0;
-			char rHam = 0;
+			const uchar lVal = lImg[3 * (l.x + x + (l.y + y) * WIDTH) + channel];
+			const uchar rVal = rImg[3 * (r.x + x + (r.y + y) * WIDTH) + channel];
 
-			if (lImg[3 * (l.x + x + (l.y + y) * WIDTH) + channel] < lCenter) lHam = 1;
-			if (rImg[3 * (r.x + x + (r.y + y) * WIDTH) + channel] < rCenter) rHam = 1;
-
-			if (rHam != lHam) hamming += 1.0;
+			if ((lVal - lCenter) * (rVal - rCenter) < 0) hamming += 1.0;
 		}
 	}
 
@@ -77,7 +74,7 @@ __kernel void kComputeCosts(__global uchar* L,
 							Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 1) + 
 						    Census((int2)(xyz.x, xyz.y), (int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), L, R, 2);
 
-	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = ADCensus(resAD, resCensus);
+	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = resCensus;
 }
 
 __kernel void kGetDisparityMap(__global float* costs,
