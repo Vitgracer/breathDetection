@@ -36,7 +36,7 @@ __kernel void kGetDisparityMap(__global float* costs,
 							   __global float* disp) {
 /*  find minimal costs values and construct isparity map */
 
-	const int2 xy = (get_global_id(0), get_global_id(1));
+	const int2 xy = (int2)(get_global_id(0), get_global_id(1));
 
 	float min = costs[xy.x + xy.y * WIDTH];
 	float minInd = 0;
