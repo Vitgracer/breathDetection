@@ -112,7 +112,7 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	_queue.enqueueWriteBuffer(bL, CL_TRUE, 0, sizeof(uchar)* SQUARE * 3, imgL.data);
 	_queue.enqueueWriteBuffer(bR, CL_TRUE, 0, sizeof(uchar)* SQUARE * 3, imgR.data);
 
-	//_launchKernel("kComputeCosts", WIDTH, HEIGHT, DIFF, 3, bL, bR, bCosts);
+	_launchKernel("kComputeCosts", WIDTH, HEIGHT, DIFF, 3, bL, bR, bCosts);
 	_launchKernel("kGetDisparityMap", WIDTH, HEIGHT, 2, bCosts, bDisp);
 
 	// read disparity result 
