@@ -3,6 +3,7 @@
 #include <fstream>
 #define WIDTH 640	
 #define HEIGHT 480
+#define SQUARE (WIDTH * HEIGHT)
 #define DISP_MAX 100
 #define DISP_MIN 0
 #define DIFF (DISP_MAX - DISP_MIN)
@@ -67,7 +68,21 @@ void breathDetection::_prepareOpenCL() {
 
 void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR, cv::Mat* disparity) {
 	/* func to calculate disparity using left and right images from stereo-pair */
+	
+	// prepare all opencl options 
 	_prepareOpenCL();
 
+	// allocate buffer memory for images 
+	cl::Buffer bL = cl::Buffer(_context, CL_MEM_READ_ONLY, sizeof(uchar) * SQUARE * 3);
+	cl::Buffer bR = cl::Buffer(_context, CL_MEM_READ_ONLY, sizeof(uchar) * SQUARE * 3);
+	cl::Buffer bOut(_context, CL_MEM_WRITE_ONLY, sizeof(float)* SQUARE);
 
+	// allocate buffer memory to store 3D costs 
+	cl::Buffer bCosts(_context, CL_MEM_READ_WRITE, sizeof(float) * SQUARE * DIFF);
+
+	// write images in the buffer 
+	_queue.enqueueWriteBuffer(bL, CL_TRUE, 0, sizeof(uchar)* SQUARE * 3, imgL.data);
+	_queue.enqueueWriteBuffer(bR, CL_TRUE, 0, sizeof(uchar)* SQUARE * 3, imgR.data);
+
+	_launchKernel("kComputeCosts", WIDTH, HEIGHT, DIFF, 3, bL, bR, bCosts);
 }
