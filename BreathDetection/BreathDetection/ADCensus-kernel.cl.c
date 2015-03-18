@@ -15,7 +15,7 @@ float AD(const uint4 l, const uint4 r) {
 		             abs_diff(l.z, r.z) ) / 3;
 }
 
-float Census(const uint2 l, const uint2 r, __global uchar* lImg, __global uchar* rImg, char channel) {
+float Census(const int2 l, const int2 r, __global uchar* lImg, __global uchar* rImg, char channel) {
 	/* Census metric */
 
 	const uchar lCenter = 3 * (l.x + l.y * WIDTH) + channel;
@@ -29,8 +29,8 @@ float Census(const uint2 l, const uint2 r, __global uchar* lImg, __global uchar*
 			// if center of the box - skip
 			if (!(x || y)) continue;
 
-			char hamL = 0;
-			char hamR = 0;
+			char lHam = 0;
+			char rHam = 0;
 
 			if (lImg[3 * (l.x + x + (l.y + y) * WIDTH) + channel] < lCenter) lHam = 1;
 			if (rImg[3 * (r.x + x + (r.y + y) * WIDTH) + channel] < rCenter) rHam = 1;
@@ -63,7 +63,7 @@ __kernel void kComputeCosts(__global uchar* L,
 						 R[rCoord + 2],
 					     0 };
 
-	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = AD(pixL, pixR);
+	costs[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = Census((int2)(xyz.x - xyz.z - DISP_MIN, xyz.y), (int2)(xyz.x, xyz.y), L, R, 0);
 }
 
 __kernel void kGetDisparityMap(__global float* costs,
