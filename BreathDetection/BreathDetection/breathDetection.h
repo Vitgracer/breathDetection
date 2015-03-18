@@ -8,14 +8,17 @@
 
 class breathDetection {
 public:
-	void _prepareOpenCL();
-	void _calculateDisparity(cv::Mat imgL, cv::Mat imgR, cv::Mat* disparity);
+	void _calculateDisparity(const cv::Mat imgL, const cv::Mat imgR, cv::Mat* disparity);
 
 private:
 	// openCL launch variables 
-	std::vector<cl::Platform> _platforms;
-	std::vector<cl::Device> _devices;
 	cl::Program _program;
 	cl::Context _context;
 	cl::CommandQueue _queue;
+	
+	void _prepareOpenCL();
+
+	// kernel functions to call 
+	void _launchKernel(const char* kernelName, const int width, const int height, const int nArgs, ...);
+	void _launchKernel(const char* kernelName, const int width, const int height, const int depth, const int nArgs, ...);
 };
