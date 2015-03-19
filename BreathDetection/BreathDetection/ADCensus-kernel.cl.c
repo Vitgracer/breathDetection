@@ -207,7 +207,7 @@ __kernel void kHorIntegration(__global float* costs,
 	float pixelHorIntegration = 0.0;
 
 	for (ushort i = supportRegion[xyz.x + xyz.y * WIDTH];
-				i < supportRegion[xyz.x + xyz.y * WIDTH] + 1;
+				i < supportRegion[xyz.x + xyz.y * WIDTH + SQUARE] + 1;
 				i++) {
 		pixelHorIntegration += costs[i + xyz.y * WIDTH + xyz.z * SQUARE];
 	}
