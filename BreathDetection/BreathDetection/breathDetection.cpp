@@ -111,6 +111,7 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	cl::Buffer bCosts(_context, CL_MEM_READ_WRITE, sizeof(float) * SQUARE * DIFF);
 	cl::Buffer bSupportRegion(_context, CL_MEM_READ_WRITE, sizeof(ushort) * SQUARE* 4);
 	cl::Buffer bAggCosts(_context, CL_MEM_READ_WRITE, sizeof(float)* SQUARE * DIFF);
+	cl::Buffer bHorIntegrated(_context, CL_MEM_READ_WRITE, sizeof(float)* SQUARE * DIFF);
 
 	// write images in the buffer 
 	_queue.enqueueWriteBuffer(bL, CL_TRUE, 0, sizeof(uchar) * SQUARE * 3, imgL.data);
@@ -123,6 +124,14 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	timer = std::clock();
 	_launchKernel("kDetectSupportRegions", WIDTH, HEIGHT, 4, 2, bL, bSupportRegion);
 	std::cout << "\nSupport regions computation: " << std::clock() - timer << " ms\n";
+
+	timer = std::clock();
+	_launchKernel("kHorIntegration", WIDTH, HEIGHT, DIFF, 3, bCosts, bHorIntegrated, bSupportRegion);
+	std::cout << "\nHorizontal integration: " << std::clock() - timer << " ms\n";
+
+	timer = std::clock();
+	_launchKernel("kVerIntegration", WIDTH, DIFF, 1, bHorIntegrated);
+	std::cout << "\nVertical integration: " << std::clock() - timer << " ms\n";
 
 	timer = std::clock();
 	_launchKernel("kAggregateCosts", WIDTH, HEIGHT, DIFF, 3, bCosts, bAggCosts, bSupportRegion);

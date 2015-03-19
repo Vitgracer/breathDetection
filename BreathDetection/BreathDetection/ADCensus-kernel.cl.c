@@ -196,6 +196,40 @@ __kernel void kDetectSupportRegions(__global uchar* lImg,
 	supportRegion[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = detectBorderPixel(lImg, (int2)(xyz.x, xyz.y), xyz.z);
 }
 
+__kernel void kHorIntegration(__global float* costs,
+						      __global float* horIntegrated,
+							  __global ushort* supportRegion) {
+/* get each pixel and summarize all pixels between its left and right  
+   support borders */
+	
+	const int3 xyz = (int3)(get_global_id(0), get_global_id(1), get_global_id(2));
+
+	float pixelHorIntegration = 0.0;
+
+	for (ushort i = supportRegion[xyz.x + xyz.y * WIDTH];
+				i < supportRegion[xyz.x + xyz.y * WIDTH] + 1;
+				i++) {
+		pixelHorIntegration += costs[i + xyz.y * WIDTH + xyz.z * SQUARE];
+	}
+
+	horIntegrated[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = pixelHorIntegration;
+}
+
+__kernel void kVerIntegration(__global float* horIntegrated) {
+/* create integral image in vertical direction */
+
+	const int2 xy = (int2)(get_global_id(0), get_global_id(1));
+
+	float verSum = horIntegrated[0 + xy.x * WIDTH + xy.y * SQUARE];
+
+	// collect vertical sums 
+	for (int i = 1; i < HEIGHT; i++) {
+		verSum += horIntegrated[xy.x + i * WIDTH + xy.y * SQUARE];
+		horIntegrated[xy.x + i * WIDTH + xy.y * SQUARE] = verSum;
+	}
+}
+						  
+
 __kernel void kAggregateCosts(__global float* costs,
 							  __global float* aggCosts, 
 							  __global ushort* supRegion) {
