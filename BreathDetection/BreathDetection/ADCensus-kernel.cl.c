@@ -223,15 +223,16 @@ __kernel void kAggregateCosts(__global float* horIntegrated,
 	
 	const int3 xyz = (int3)(get_global_id(0), get_global_id(1), get_global_id(2));
 	
-	const ushort up = supRegion[xyz.x + xyz.y * WIDTH + 2 * SQUARE];
-	const ushort down = supRegion[xyz.x + xyz.y * WIDTH + 3 * SQUARE];
-	
 	float sum = 0.0;
 
-	for (int i = up; i < down + 1; i++) {
+	// we have horizontal integrated images. Now summarize it from up to down 
+	// and get final aggregated result 
+	for (int i = supRegion[xyz.x + xyz.y * WIDTH + 2 * SQUARE];
+			 i < supRegion[xyz.x + xyz.y * WIDTH + 3 * SQUARE] + 1; 
+		     i++) {
 		
 		sum += horIntegrated[xyz.x + i * WIDTH + xyz.z * SQUARE];
-		
 	}
+
 	aggCosts[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = sum;
 }
