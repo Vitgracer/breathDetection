@@ -209,8 +209,8 @@ __kernel void kAggregateCosts(__global float* costs,
 	float sum = 0.0;
 
 	for (int i = up; i < down + 1; i++) {
-		const ushort left = supRegion[xyz.x + (xyz.y + i) * WIDTH];
-		const ushort right = supRegion[xyz.x + (xyz.y + i) * WIDTH + SQUARE];
+		const ushort left = supRegion[xyz.x + i * WIDTH];
+		const ushort right = supRegion[xyz.x + i * WIDTH + SQUARE];
 
 		for (int j = left; j < right + 1; j++) {
 			sum += costs[j + i * WIDTH + xyz.z];
