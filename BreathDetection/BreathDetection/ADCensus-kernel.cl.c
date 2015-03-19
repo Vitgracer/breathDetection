@@ -8,6 +8,8 @@
 #define DIFF (DISP_MAX - DISP_MIN)
 #define AD_LAMBD 10
 #define CENSUS_LAMBD 30
+#define TAU1 20 
+#define L1 34
 
 float AD(const uint4 l, const uint4 r) {
 	/* AD metric*/
@@ -115,6 +117,13 @@ float DS(const int2 p1, const int2 p2) {
 /* DS metric */
 	return sqrt (float) (p1.x - p2.x) * (p1.x - p2.x) +
 						(p1.y - p2.y) * (p1.y - p2.y) );
+}
+
+bool supportRegionRule(__global uchar* img, const int2 keyPoint, const int2 borderPoint) {
+/* using rule from the article, detect borders */
+
+	if (DC(img, keyPoint, borderPoint) < TAU1 && DS(keuPoint, borderPoint) < L1) return true;
+	else return false;
 }
 
 int detectBorderPixel(__global uchar* img, const int2 p, const int direction) {
