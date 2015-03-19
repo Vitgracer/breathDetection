@@ -99,3 +99,23 @@ __kernel void kGetDisparityMap(__global float* costs,
 
 	disp[xy.x + xy.y * WIDTH] = minInd;
 }
+
+int detectBorderPixel(__global uchar* img, const int2 p, const int direction) {
+/* detect support region fir everey pixel 
+   0 - left direction 
+   1 - right 
+   2 - up 
+   3 - down */
+
+
+}
+
+__kernel void kDetectSupportRegions(__global uchar* lImg,
+								    __global ushort* supportRegion) {
+/* detect border pixels for every pixel (left-right-up-down) */
+
+	const int3 xyz = (int3)(get_global_id(0), get_global_id(1), get_global_id(2));
+
+	// last argument is a variant of direction (0 - L, 1 - R, 2 - U, 3 - D)
+	supportRegion[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = detectBorderPixel(lImg, (int2)(xyz.x, xyz.y), xyz.z);
+}
