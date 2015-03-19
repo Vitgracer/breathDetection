@@ -140,7 +140,7 @@ int detectBorderPixel(__global uchar* img, const int2 keyPoint, const int direct
 			int counter = 1;
 			
 			while ( keyPoint.x - counter >= 0 && 
-				    supportRegionRule(img, keyPoint, (int2)(keyPoint.x - counter))) counter++;
+				    supportRegionRule(img, keyPoint, (int2)(keyPoint.x - counter, keyPoint.y))) counter++;
 			
 			border = keyPoint.x - counter + 1;
 			
@@ -151,7 +151,7 @@ int detectBorderPixel(__global uchar* img, const int2 keyPoint, const int direct
 			int counter = 1;
 
 			while (keyPoint.x + counter < WIDTH &&
-				   supportRegionRule(img, keyPoint, (int2)(keyPoint.x + counter))) counter++;
+				   supportRegionRule(img, keyPoint, (int2)(keyPoint.x + counter, keyPoint.y))) counter++;
 
 			border = keyPoint.x + counter - 1;
 
@@ -162,7 +162,7 @@ int detectBorderPixel(__global uchar* img, const int2 keyPoint, const int direct
 			int counter = 1;
 
 			while (keyPoint.y - counter >= 0 &&
-				   supportRegionRule(img, keyPoint, (int2)(keyPoint.y - counter))) counter++;
+				   supportRegionRule(img, keyPoint, (int2)(keyPoint.x, keyPoint.y - counter))) counter++;
 
 			border = keyPoint.y - counter + 1;
 
@@ -173,7 +173,7 @@ int detectBorderPixel(__global uchar* img, const int2 keyPoint, const int direct
 			int counter = 1;
 
 			while (keyPoint.y + counter < HEIGHT &&
-				   supportRegionRule(img, keyPoint, (int2)(keyPoint.y + counter))) counter++;
+				   supportRegionRule(img, keyPoint, (int2)(keyPoint.x, keyPoint.y + counter))) counter++;
 
 			border = keyPoint.y + counter - 1;
 
