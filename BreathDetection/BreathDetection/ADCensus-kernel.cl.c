@@ -36,6 +36,7 @@ float Census(const int2 l, const int2 r, __global uchar* lImg, __global uchar* r
 			const uchar lVal = lImg[3 * (l.x + x + (l.y + y) * WIDTH) + channel];
 			const uchar rVal = rImg[3 * (r.x + x + (r.y + y) * WIDTH) + channel];
 
+			// if we have different signs 
 			if ((lVal - lCenter) * (rVal - rCenter) < 0) hamming += 1.0;
 		}
 	}
@@ -127,7 +128,7 @@ bool supportRegionRule(__global uchar* img, const int2 keyPoint, const int2 bord
 }
 
 int detectBorderPixel(__global uchar* img, const int2 keyPoint, const int direction) {
-/* detect support region fir everey pixel 
+/* detect support region for everey pixel 
    0 - left direction 
    1 - right 
    2 - up 
