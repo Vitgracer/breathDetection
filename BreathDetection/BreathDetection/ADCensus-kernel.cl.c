@@ -36,6 +36,7 @@ float Census(const int2 l, const int2 r, __global uchar* lImg, __global uchar* r
 			const uchar lVal = lImg[3 * (l.x + x + (l.y + y) * WIDTH) + channel];
 			const uchar rVal = rImg[3 * (r.x + x + (r.y + y) * WIDTH) + channel];
 
+			// if we have different signs 
 			if ((lVal - lCenter) * (rVal - rCenter) < 0) hamming += 1.0;
 		}
 	}
@@ -127,7 +128,7 @@ bool supportRegionRule(__global uchar* img, const int2 keyPoint, const int2 bord
 }
 
 int detectBorderPixel(__global uchar* img, const int2 keyPoint, const int direction) {
-/* detect support region fir everey pixel 
+/* detect support region for everey pixel 
    0 - left direction 
    1 - right 
    2 - up 
@@ -196,25 +197,42 @@ __kernel void kDetectSupportRegions(__global uchar* lImg,
 	supportRegion[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = detectBorderPixel(lImg, (int2)(xyz.x, xyz.y), xyz.z);
 }
 
-__kernel void kAggregateCosts(__global float* costs,
+__kernel void kHorIntegration(__global float* costs,
+						      __global float* horIntegrated,
+							  __global ushort* supportRegion) {
+/* get each pixel and summarize all pixels between its left and right  
+   support borders */
+	
+	const int3 xyz = (int3)(get_global_id(0), get_global_id(1), get_global_id(2));
+
+	float pixelHorIntegration = 0.0;
+
+	for (ushort i = supportRegion[xyz.x + xyz.y * WIDTH];
+				i < supportRegion[xyz.x + xyz.y * WIDTH + SQUARE] + 1;
+				i++) {
+		pixelHorIntegration += costs[i + xyz.y * WIDTH + xyz.z * SQUARE];
+	}
+
+	horIntegrated[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = pixelHorIntegration;
+}
+						  
+__kernel void kAggregateCosts(__global float* horIntegrated,
 							  __global float* aggCosts, 
 							  __global ushort* supRegion) {
 	/* cocts aggregation step */
 	
 	const int3 xyz = (int3)(get_global_id(0), get_global_id(1), get_global_id(2));
 	
-	const ushort up = supRegion[xyz.x + xyz.y * WIDTH + 2 * SQUARE];
-	const ushort down = supRegion[xyz.x + xyz.y * WIDTH + 3 * SQUARE];
-	
 	float sum = 0.0;
 
-	for (int i = up; i < down + 1; i++) {
-		const ushort left = supRegion[xyz.x + i * WIDTH];
-		const ushort right = supRegion[xyz.x + i * WIDTH + SQUARE];
-
-		for (int j = left; j < right + 1; j++) {
-			sum += costs[j + i * WIDTH + xyz.z * SQUARE];
-		}
+	// we have horizontal integrated images. Now summarize it from up to down 
+	// and get final aggregated result 
+	for (int i = supRegion[xyz.x + xyz.y * WIDTH + 2 * SQUARE];
+			 i < supRegion[xyz.x + xyz.y * WIDTH + 3 * SQUARE] + 1; 
+		     i++) {
+		
+		sum += horIntegrated[xyz.x + i * WIDTH + xyz.z * SQUARE];
 	}
+
 	aggCosts[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = sum;
 }
