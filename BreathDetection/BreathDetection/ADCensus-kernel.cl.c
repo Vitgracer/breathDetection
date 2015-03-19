@@ -108,47 +108,82 @@ float DC(__global uchar* img, const int2 p1, const int2 p2) {
 	const int coord2 = 3 * (p2.x + p2.y * WIDTH);
 	
 	//return maximum among three channels
-	return max(abs_diff(img[coord1],     img[coord2]),
-		   max(abs_diff(img[coord1 + 1], img[coord2 + 1])), 
-		       abs_diff(img[coord1 + 2], img[coord2 + 2]));
+	return max( abs_diff(img[coord1],     img[coord2]),
+		   max( abs_diff(img[coord1 + 1], img[coord2 + 1]), 
+		        abs_diff(img[coord1 + 2], img[coord2 + 2]) ) );
 }
 
 float DS(const int2 p1, const int2 p2) {
 /* DS metric */
-	return sqrt (float) (p1.x - p2.x) * (p1.x - p2.x) +
-						(p1.y - p2.y) * (p1.y - p2.y) );
+	return sqrt( (float) ( (p1.x - p2.x) * (p1.x - p2.x) + 
+						   (p1.y - p2.y) * (p1.y - p2.y) ) );
 }
 
 bool supportRegionRule(__global uchar* img, const int2 keyPoint, const int2 borderPoint) {
 /* using rule from the article, detect borders */
 
-	if (DC(img, keyPoint, borderPoint) < TAU1 && DS(keuPoint, borderPoint) < L1) return true;
+	if (DC(img, keyPoint, borderPoint) < TAU1 && DS(keyPoint, borderPoint) < L1) return true;
 	else return false;
 }
 
-int detectBorderPixel(__global uchar* img, const int2 p, const int direction) {
+int detectBorderPixel(__global uchar* img, const int2 keyPoint, const int direction) {
 /* detect support region fir everey pixel 
    0 - left direction 
    1 - right 
    2 - up 
    3 - down */
 
+	int border;
+
 	switch (direction) {
 		case 0: {
+			int counter = 1;
+			
+			while ( keyPoint.x - counter >= 0 && 
+				    supportRegionRule(img, keyPoint, (int2)(keyPoint.x - counter))) counter++;
+			
+			border = keyPoint.x - counter + 1;
+			
 			break;
 		}
-		case 1:{
+
+		case 1: {
+			int counter = 1;
+
+			while (keyPoint.x + counter < WIDTH &&
+				   supportRegionRule(img, keyPoint, (int2)(keyPoint.x + counter))) counter++;
+
+			border = keyPoint.x + counter - 1;
+
 			break;
 		}
+
 		case 2: {
+			int counter = 1;
+
+			while (keyPoint.y - counter >= 0 &&
+				   supportRegionRule(img, keyPoint, (int2)(keyPoint.y - counter))) counter++;
+
+			border = keyPoint.y - counter + 1;
+
 			break;
 		}
+
 		case 3: {
+			int counter = 1;
+
+			while (keyPoint.y + counter < HEIGHT &&
+				   supportRegionRule(img, keyPoint, (int2)(keyPoint.y + counter))) counter++;
+
+			border = keyPoint.y + counter - 1;
+
 			break;
 		}
 		default: 
 			break;
 	}
+
+	return border;
 }
 
 __kernel void kDetectSupportRegions(__global uchar* lImg,
