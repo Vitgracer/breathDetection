@@ -214,23 +214,8 @@ __kernel void kHorIntegration(__global float* costs,
 
 	horIntegrated[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = pixelHorIntegration;
 }
-
-__kernel void kVerIntegration(__global float* horIntegrated) {
-/* create integral image in vertical direction */
-
-	const int2 xy = (int2)(get_global_id(0), get_global_id(1));
-
-	float verSum = horIntegrated[0 + xy.x * WIDTH + xy.y * SQUARE];
-
-	// collect vertical sums 
-	for (int i = 1; i < HEIGHT; i++) {
-		verSum += horIntegrated[xy.x + i * WIDTH + xy.y * SQUARE];
-		horIntegrated[xy.x + i * WIDTH + xy.y * SQUARE] = verSum;
-	}
-}
 						  
-
-__kernel void kAggregateCosts(__global float* costs,
+__kernel void kAggregateCosts(__global float* horIntegrated,
 							  __global float* aggCosts, 
 							  __global ushort* supRegion) {
 	/* cocts aggregation step */
@@ -243,12 +228,9 @@ __kernel void kAggregateCosts(__global float* costs,
 	float sum = 0.0;
 
 	for (int i = up; i < down + 1; i++) {
-		const ushort left = supRegion[xyz.x + i * WIDTH];
-		const ushort right = supRegion[xyz.x + i * WIDTH + SQUARE];
-
-		for (int j = left; j < right + 1; j++) {
-			sum += costs[j + i * WIDTH + xyz.z * SQUARE];
-		}
+		
+		sum += horIntegrated[xyz.x + i * WIDTH + xyz.z * SQUARE];
+		
 	}
 	aggCosts[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = sum;
 }
