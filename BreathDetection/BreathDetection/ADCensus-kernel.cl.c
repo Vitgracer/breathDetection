@@ -195,3 +195,26 @@ __kernel void kDetectSupportRegions(__global uchar* lImg,
 	// last argument is a variant of direction (0 - L, 1 - R, 2 - U, 3 - D)
 	supportRegion[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = detectBorderPixel(lImg, (int2)(xyz.x, xyz.y), xyz.z);
 }
+
+__kernel void kAggregateCosts(__global float* costs,
+							  __global float* aggCosts, 
+							  __global ushort* supRegion) {
+	/* cocts aggregation step */
+	
+	const int3 xyz = (int3)(get_global_id(0), get_global_id(1), get_global_id(2));
+	
+	const ushort up = supRegion[xyz.x + xyz.y * WIDTH + 2 * SQUARE];
+	const ushort down = supRegion[xyz.x + xyz.y * WIDTH + 3 * SQUARE];
+	
+	float sum = 0.0;
+
+	for (int i = up; i < down + 1; i++) {
+		const ushort left = supRegion[xyz.x + (xyz.y + i) * WIDTH];
+		const ushort right = supRegion[xyz.x + (xyz.y + i) * WIDTH + SQUARE];
+
+		for (int j = left; j < right + 1; j++) {
+			sum += costs[j + i * WIDTH + xyz.z];
+		}
+	}
+	aggCosts[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = sum;
+}
