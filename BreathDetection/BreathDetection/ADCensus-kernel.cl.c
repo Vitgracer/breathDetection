@@ -100,6 +100,17 @@ __kernel void kGetDisparityMap(__global float* costs,
 	disp[xy.x + xy.y * WIDTH] = minInd;
 }
 
+float DC(__global uchar* img, const int2 p1, const int2 p2) {
+/* DC metric */
+	const int coord1 = 3 * (p1.x + p1.y * WIDTH);
+	const int coord2 = 3 * (p2.x + p2.y * WIDTH);
+	
+	//return maximum among three channels
+	return max(abs_diff(img[coord1],     img[coord2]),
+		   max(abs_diff(img[coord1 + 1], img[coord2 + 1])), 
+		       abs_diff(img[coord1 + 2], img[coord2 + 2]));
+}
+
 float DS(const int2 p1, const int2 p2) {
 /* DS metric */
 	return sqrt (float) (p1.x - p2.x) * (p1.x - p2.x) +
