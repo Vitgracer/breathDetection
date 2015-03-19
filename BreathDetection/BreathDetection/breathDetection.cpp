@@ -109,7 +109,7 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 
 	// allocate buffer memory to store 3D costs 
 	cl::Buffer bCosts(_context, CL_MEM_READ_WRITE, sizeof(float) * SQUARE * DIFF);
-	cl::Buffer bSupportDegion(_context, CL_MEM_READ_WRITE, sizeof(ushort) * SQUARE* 4);
+	cl::Buffer bSupportRegion(_context, CL_MEM_READ_WRITE, sizeof(ushort) * SQUARE* 4);
 
 	// write images in the buffer 
 	_queue.enqueueWriteBuffer(bL, CL_TRUE, 0, sizeof(uchar) * SQUARE * 3, imgL.data);
@@ -120,7 +120,7 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	std::cout << "\nCosts computation: " << std::clock() - timer << " ms\n";
 
 	timer = std::clock();
-	_launchKernel("kDetectSupportRegions", WIDTH, HEIGHT, 4, 3, bL, bSupportDegion);
+	_launchKernel("kDetectSupportRegions", WIDTH, HEIGHT, 4, 2, bL, bSupportRegion);
 	std::cout << "\nSupport regions computation: " << std::clock() - timer << " ms\n";
 
 	timer = std::clock();
