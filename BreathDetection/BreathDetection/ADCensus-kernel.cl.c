@@ -100,6 +100,12 @@ __kernel void kGetDisparityMap(__global float* costs,
 	disp[xy.x + xy.y * WIDTH] = minInd;
 }
 
+float DS(const int2 p1, const int2 p2) {
+/* DS metric */
+	return sqrt (float) (p1.x - p2.x) * (p1.x - p2.x) +
+						(p1.y - p2.y) * (p1.y - p2.y) );
+}
+
 int detectBorderPixel(__global uchar* img, const int2 p, const int direction) {
 /* detect support region fir everey pixel 
    0 - left direction 
@@ -107,7 +113,22 @@ int detectBorderPixel(__global uchar* img, const int2 p, const int direction) {
    2 - up 
    3 - down */
 
-
+	switch (direction) {
+		case 0: {
+			break;
+		}
+		case 1:{
+			break;
+		}
+		case 2: {
+			break;
+		}
+		case 3: {
+			break;
+		}
+		default: 
+			break;
+	}
 }
 
 __kernel void kDetectSupportRegions(__global uchar* lImg,
