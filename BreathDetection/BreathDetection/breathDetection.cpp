@@ -129,7 +129,7 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	std::cout << "\nCost aggregation: " << std::clock() - timer << " ms\n";
 
 	timer = std::clock();
-	_launchKernel("kGetDisparityMap", WIDTH, HEIGHT, 2, bCosts, bDisp);
+	_launchKernel("kGetDisparityMap", WIDTH, HEIGHT, 2, bAggCosts, bDisp);
 	std::cout << "\nDisparity computation: " << std::clock() - timer << " ms\n";
 
 	// read disparity result 
