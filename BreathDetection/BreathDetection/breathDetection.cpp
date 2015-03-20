@@ -127,6 +127,10 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	std::cout << "\nHorizontal integration: " << std::clock() - timer << " ms\n";
 
 	timer = std::clock();
+	_launchKernel("kVerIntegration", WIDTH, DIFF, 1, bHorIntegrated);
+	std::cout << "\nVertical integration: " << std::clock() - timer << " ms\n";
+
+	timer = std::clock();
 	_launchKernel("kAggregateCosts", WIDTH, HEIGHT, DIFF, 3, bHorIntegrated, bAggCosts, bSupportRegion);
 	std::cout << "\nCost aggregation: " << std::clock() - timer << " ms\n";
 

@@ -215,24 +215,30 @@ __kernel void kHorIntegration(__global float* costs,
 
 	horIntegrated[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = pixelHorIntegration;
 }
-						  
+		
+__kernel void kVerIntegration(__global float* costs) {
+/* create 1D integral image from bHorIntegration*/
+
+	const int2 xy = (int2)(get_global_id(0), get_global_id(1));
+	float verticalSum = costs[xy.x + xy.y * SQUARE];
+	
+	// create 1D integral image among every column
+	for (int i = 1; i < HEIGHT; i++) {
+		const int coord = i * WIDTH + xy.x + xy.y * SQUARE;
+		
+		verticalSum += costs[coord];
+		costs[coord] = verticalSum;
+	}
+}
+
 __kernel void kAggregateCosts(__global float* horIntegrated,
 							  __global float* aggCosts, 
 							  __global ushort* supRegion) {
 	/* cocts aggregation step */
 	
 	const int3 xyz = (int3)(get_global_id(0), get_global_id(1), get_global_id(2));
-	
-	float sum = 0.0;
 
-	// we have horizontal integrated images. Now summarize it from up to down 
-	// and get final aggregated result 
-	for (int i = supRegion[xyz.x + xyz.y * WIDTH + 2 * SQUARE];
-			 i < supRegion[xyz.x + xyz.y * WIDTH + 3 * SQUARE] + 1; 
-		     i++) {
-		
-		sum += horIntegrated[xyz.x + i * WIDTH + xyz.z * SQUARE];
-	}
-
-	aggCosts[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = sum;
+	// using 1D integral image, which we'vw created one step above, substract downward - upward pixels 
+	aggCosts[xyz.x + xyz.y * WIDTH + xyz.z * SQUARE] = horIntegrated[xyz.x +  supRegion[xyz.x + xyz.y * WIDTH + 3 * SQUARE]      * WIDTH + xyz.z * SQUARE] -
+													   horIntegrated[xyz.x + (supRegion[xyz.x + xyz.y * WIDTH + 2 * SQUARE] - 1) * WIDTH + xyz.z * SQUARE];
 }
