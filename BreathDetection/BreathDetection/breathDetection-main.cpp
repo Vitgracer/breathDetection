@@ -31,6 +31,21 @@ int main() {
 	// prepare all opencl options 
 	engine._prepareOpenCL();
 
+	cv::VideoCapture capL("D:/MyDOC/Диплом/BreathDetection/BreathDetection/Video/left.mp4");
+	cv::VideoCapture capR("D:/MyDOC/Диплом/BreathDetection/BreathDetection/Video/right.mp4");
+
+	while (true) {
+		cv::Mat l;
+		cv::Mat r;
+		capL >> l;
+		capR >> r;
+		
+		cv::resize(l, l, cv::Size(WIDTH, HEIGHT));
+		cv::resize(r, r, cv::Size(WIDTH, HEIGHT));
+		engine._calculateDisparity(l, r, &disparity);
+		int a = 2;
+	}
+
 	std::clock_t timer = std::clock();
 	engine._calculateDisparity(imgL, imgR, &disparity);
 	std::cout << "\nTotal: " << std::clock() - timer << " ms\n";
