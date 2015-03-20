@@ -4,6 +4,7 @@
 #define HEIGHT 480
 
 #include <ctime>
+#include <iostream>
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
@@ -30,7 +31,9 @@ int main() {
 	// prepare all opencl options 
 	engine._prepareOpenCL();
 
+	std::clock_t timer = std::clock();
 	engine._calculateDisparity(imgL, imgR, &disparity);
+	std::cout << "\nTotal: " << std::clock() - timer << " ms\n";
 
 	return 0;
 }
