@@ -21,9 +21,13 @@ int main() {
 	// prepare images 
 	cv::resize(imgL, imgL, cv::Size(WIDTH, HEIGHT));
 	cv::resize(imgR, imgR, cv::Size(WIDTH, HEIGHT));
-	
+
 	// launch engine to calculate dusparity
 	breathDetection engine;
+
+	// prepare all opencl options 
+	engine._prepareOpenCL();
+
 	engine._calculateDisparity(imgL, imgR, &disparity);
 
 	return 0;

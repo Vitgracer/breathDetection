@@ -98,9 +98,6 @@ void breathDetection::_prepareOpenCL() {
 
 void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR, cv::Mat* disparity) {
 	/* func to calculate disparity using left and right images from stereo-pair */
-	
-	// prepare all opencl options 
-	_prepareOpenCL();
 
 	// allocate buffer memory for images 
 	cl::Buffer bL = cl::Buffer(_context, CL_MEM_READ_ONLY, sizeof(uchar) * SQUARE * 3);
