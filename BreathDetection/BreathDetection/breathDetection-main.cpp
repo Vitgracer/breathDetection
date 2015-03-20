@@ -33,13 +33,17 @@ int main() {
 
 	cv::VideoCapture capL("D:/MyDOC/Диплом/BreathDetection/BreathDetection/Video/left.mp4");
 	cv::VideoCapture capR("D:/MyDOC/Диплом/BreathDetection/BreathDetection/Video/right.mp4");
+	cv::VideoCapture cap;
+	cap.open("http://192.168.1.35:8080/camera.mjpg");
 
 	while (true) {
 		cv::Mat l;
 		cv::Mat r;
+		cv::Mat frame;
 		capL >> l;
 		capR >> r;
-		
+		cap >> frame;
+
 		cv::resize(l, l, cv::Size(WIDTH, HEIGHT));
 		cv::resize(r, r, cv::Size(WIDTH, HEIGHT));
 		engine._calculateDisparity(l, r, &disparity);
