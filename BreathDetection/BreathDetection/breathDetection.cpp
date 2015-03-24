@@ -3,7 +3,7 @@
 #define WIDTH 640	
 #define HEIGHT 480
 #define SQUARE (WIDTH * HEIGHT)
-#define DISP_MAX 40
+#define DISP_MAX 100
 #define DISP_MIN 0
 #define DIFF (DISP_MAX - DISP_MIN)
 
@@ -114,29 +114,29 @@ void breathDetection::_calculateDisparity(const cv::Mat imgL, const cv::Mat imgR
 	_queue.enqueueWriteBuffer(bL, CL_TRUE, 0, sizeof(uchar) * SQUARE * 3, imgL.data);
 	_queue.enqueueWriteBuffer(bR, CL_TRUE, 0, sizeof(uchar) * SQUARE * 3, imgR.data);
 	
-	std::clock_t timer = std::clock();
+	//std::clock_t timer = std::clock();
 	_launchKernel("kComputeCosts", WIDTH, HEIGHT, DIFF, 3, bL, bR, bCosts);
-	std::cout << "\nCosts computation: " << std::clock() - timer << " ms\n";
+	//std::cout << "\nCosts computation: " << std::clock() - timer << " ms\n";
 
-	timer = std::clock();
+	//timer = std::clock();
 	_launchKernel("kDetectSupportRegions", WIDTH, HEIGHT, 4, 2, bL, bSupportRegion);
-	std::cout << "\nSupport regions computation: " << std::clock() - timer << " ms\n";
+	//std::cout << "\nSupport regions computation: " << std::clock() - timer << " ms\n";
 
-	timer = std::clock();
+	//timer = std::clock();
 	_launchKernel("kHorIntegration", WIDTH, HEIGHT, DIFF, 3, bCosts, bHorIntegrated, bSupportRegion);
-	std::cout << "\nHorizontal integration: " << std::clock() - timer << " ms\n";
+	//std::cout << "\nHorizontal integration: " << std::clock() - timer << " ms\n";
 
-	timer = std::clock();
+	//timer = std::clock();
 	_launchKernel("kVerIntegration", WIDTH, DIFF, 1, bHorIntegrated);
-	std::cout << "\nVertical integration: " << std::clock() - timer << " ms\n";
+	//std::cout << "\nVertical integration: " << std::clock() - timer << " ms\n";
 
-	timer = std::clock();
+	//timer = std::clock();
 	_launchKernel("kAggregateCosts", WIDTH, HEIGHT, DIFF, 3, bHorIntegrated, bAggCosts, bSupportRegion);
-	std::cout << "\nCost aggregation: " << std::clock() - timer << " ms\n";
+	//std::cout << "\nCost aggregation: " << std::clock() - timer << " ms\n";
 
-	timer = std::clock();
+	//timer = std::clock();
 	_launchKernel("kGetDisparityMap", WIDTH, HEIGHT, 2, bAggCosts, bDisp);
-	std::cout << "\nDisparity computation: " << std::clock() - timer << " ms\n";
+	//std::cout << "\nDisparity computation: " << std::clock() - timer << " ms\n";
 
 	// read disparity result 
 	std::vector<float> dispData(SQUARE);
