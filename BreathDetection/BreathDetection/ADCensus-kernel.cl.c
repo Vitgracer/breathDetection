@@ -8,8 +8,8 @@
 #define DIFF (DISP_MAX - DISP_MIN)
 #define AD_LAMBD 10
 #define CENSUS_LAMBD 30
-#define TAU1 10 
-#define L1 20
+#define TAU1 30 
+#define L1 50
 
 float AD(const uint4 l, const uint4 r) {
 	/* AD metric*/

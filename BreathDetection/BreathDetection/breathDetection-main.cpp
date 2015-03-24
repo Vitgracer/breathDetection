@@ -42,10 +42,30 @@ int main() {
 
 		cv::resize(l, l, cv::Size(WIDTH, HEIGHT));
 		cv::resize(r, r, cv::Size(WIDTH, HEIGHT));
-		engine._calculateDisparity(l, r, &disparity);
 		
+
+		int shiftValue = 86;
+		cv::Mat shiftedR = cv::Mat::zeros(r.size(), r.type());
+		r(cv::Rect(0, shiftValue, r.cols, r.rows - shiftValue)).copyTo(shiftedR(cv::Rect(0, 0, r.cols, r.rows - shiftValue)));
+
+		cv::line(l, cv::Point(0, 160), cv::Point(640, 160), cv::Scalar(255));
+		cv::line(l, cv::Point(0, 320), cv::Point(640, 320), cv::Scalar(255));
+		cv::line(r, cv::Point(0, 160), cv::Point(640, 160), cv::Scalar(255));
+		cv::line(r, cv::Point(0, 320), cv::Point(640, 320), cv::Scalar(255));
+		cv::line(shiftedR, cv::Point(0, 160), cv::Point(640, 160), cv::Scalar(255));
+		cv::line(shiftedR, cv::Point(0, 320), cv::Point(640, 320), cv::Scalar(255));
+
+		
+
+		cv::medianBlur(l, l, 9);
+		cv::medianBlur(shiftedR, shiftedR, 9);
+
 		cv::imshow("l", l);
-		cv::imshow("r", r);
+		//cv::imshow("r", r);
+
+		cv::imshow("rs", shiftedR);
+
+		engine._calculateDisparity(l, shiftedR, &disparity);
 		cv::normalize(disparity, disparity, 0, 1, cv::NORM_MINMAX);
 		cv::imshow("disp", disparity);
 
