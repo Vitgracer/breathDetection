@@ -3,13 +3,13 @@
 #define WIDTH 640
 #define HEIGHT 480
 #define SQUARE (WIDTH * HEIGHT)
-#define DISP_MAX 100
+#define DISP_MAX 150
 #define DISP_MIN 0
 #define DIFF (DISP_MAX - DISP_MIN)
 #define AD_LAMBD 10
 #define CENSUS_LAMBD 30
-#define TAU1 10 
-#define L1 20
+#define TAU1 40 
+#define L1 60
 
 float AD(const uint4 l, const uint4 r) {
 	/* AD metric*/
