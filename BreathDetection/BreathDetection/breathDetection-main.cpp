@@ -14,37 +14,10 @@
 
 
 int main() {
-	//cv::Mat imgL = cv::imread("D:/MyDOC/Диплом/BreathDetection/BreathDetection/images/Tsukuba/left_picture.png");
-	//cv::Mat imgR = cv::imread("D:/MyDOC/Диплом/BreathDetection/BreathDetection/images/Tsukuba/right_picture.png");
-	//cv::Mat imgL = cv::imread("D:/MyDOC/Диплом/BreathDetection/BreathDetection/images/Cegles/left_picture.png");
-	//cv::Mat imgR = cv::imread("D:/MyDOC/Диплом/BreathDetection/BreathDetection/images/Cegles/right_picture.png");
-
+	
 	cv::Mat disparity;
 
-	cv::Mat CM1 = cv::Mat(3, 3, CV_64FC1);
-	cv::Mat CM2 = cv::Mat(3, 3, CV_64FC1);
-	cv::Mat D1, D2;
-	cv::Mat R, T, E, F;
-	cv::Mat R1, R2, P1, P2, Q;
-
-	cv::VideoWriter outputVideoL("D:/MyDOC/Диплом/Результаты/7/l.avi", -1, 6, cv::Size(640, 480));
-	cv::VideoWriter outputVideoR("D:/MyDOC/Диплом/Результаты/7/r.avi", -1, 6, cv::Size(640, 480));
-
-	cv::FileStorage fs1("D:/MyDOC/Диплом/BreathDetection/BreathDetection/BreathDetection/mystereocalibGOOD.yml", cv::FileStorage::READ);
-	fs1["CM1"] >> CM1;
-	fs1["CM2"] >> CM2;
-	fs1["D1"] >> D1;
-	fs1["D2"] >> D2;
-	fs1["R1"] >> R1;
-	fs1["R2"] >> R2;
-	fs1["P1"] >> P1;
-	fs1["P2"] >> P2;
-
-	cv::Mat maplx, maply, maprx, mapry;
-	cv::Mat imgUl, imgUr;
-
-	initUndistortRectifyMap(CM1, D1, R1, P1, cv::Size(WIDTH, HEIGHT), CV_32FC1, maplx, maply);
-	initUndistortRectifyMap(CM2, D2, R2, P2, cv::Size(WIDTH, HEIGHT), CV_32FC1, maprx, mapry);
+	
 
 	// prepare images 
 	//cv::resize(imgL, imgL, cv::Size(WIDTH, HEIGHT));
@@ -55,38 +28,40 @@ int main() {
 
 	// prepare all opencl options 
 	engine._prepareOpenCL();
-
-	cv::VideoCapture capL(0);
-	cv::VideoCapture capR(1);
-
+	cv::Mat graph = cv::Mat(cv::Size(1500, 500), CV_8UC1);
+	cv::rectangle(graph, cv::Rect(0, 0, 1500, 500), cv::Scalar(0), -1);
+	cv::VideoCapture capL("D:/MyDOC/Диплом/Результаты/6/l.avi");
+	cv::VideoCapture capR("D:/MyDOC/Диплом/Результаты/6/r.avi");
+	int i = 0;
+	cv::Point start = cv::Point(0, 0);
 	while (true) {
+		i+= 2;
 		cv::Mat l;
 		cv::Mat r;
 		capL >> l;
 		capR >> r;
 		cv::resize(l, l, cv::Size(WIDTH, HEIGHT));
 		cv::resize(r, r, cv::Size(WIDTH, HEIGHT));
+		if (!l.data) break;
+	
+		engine._calculateDisparity(l, r, &disparity);
+		cv::rectangle(disparity, cv::Rect(300, 200, 40, 80), cv::Scalar(255));
 
-		cv::remap(l, imgUl, maplx, maply, cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar());
-		cv::remap(r, imgUr, maprx, mapry, cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar());
+		float sum = 0.0;
 
-		engine._calculateDisparity(imgUr, imgUl, &disparity);
-		
-		outputVideoL << imgUr;
-		outputVideoR << imgUl;
+		for (int i = 300; i < 340; i++) {
+			for (int j = 200; j < 280; j++) {
+				sum += disparity.at<float>(i,j);
+			}
+		}
+		std::cout << sum / 3200 << "\n";
+		cv::Point end = cv::Point(i, 500 - 500 * (sum / 3200 - 60) / (90 - 60));
+		cv::line(graph, start, end, cv::Scalar(255));
+		start = end;
 
-		cv::line(imgUl, cv::Point(0, 160), cv::Point(640, 160), cv::Scalar(255));
-		cv::line(imgUl, cv::Point(0, 320), cv::Point(640, 320), cv::Scalar(255));
-		cv::line(imgUr, cv::Point(0, 160), cv::Point(640, 160), cv::Scalar(255));
-		cv::line(imgUr, cv::Point(0, 320), cv::Point(640, 320), cv::Scalar(255));
-
-		cv::line(l, cv::Point(0, 160), cv::Point(640, 160), cv::Scalar(255));
-		cv::line(l, cv::Point(0, 320), cv::Point(640, 320), cv::Scalar(255));
-		cv::line(r, cv::Point(0, 160), cv::Point(640, 160), cv::Scalar(255));
-		cv::line(r, cv::Point(0, 320), cv::Point(640, 320), cv::Scalar(255));
-
-		cv::imshow("ld", imgUl);
-		cv::imshow("rd", imgUr);
+		cv::imshow("graph", graph);
+		cv::imshow("ld", l);
+		cv::imshow("rd", r);
 		//cv::imshow("l", l);
 		//cv::imshow("r", r);
 		cv::normalize(disparity, disparity, 0, 1, cv::NORM_MINMAX);
