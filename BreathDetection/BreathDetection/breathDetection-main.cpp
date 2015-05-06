@@ -39,6 +39,9 @@ int main() {
 	std::vector<cv::Point> sumValues;
 	int breathNumber = 0;
 
+	int shrinkHeight = 500.0 + 480.0 / (640.0 / 500.0);
+	cv::Mat toShow = cv::Mat(shrinkHeight, 1500, CV_8UC3);
+
 	while (true) {
 		counter++;
 		cv::Mat l;
@@ -98,13 +101,27 @@ int main() {
 		cv::line(graph, start, end, cv::Scalar(255, 255, 255));
 		start = end;
 
-		cv::imshow("graph", graph);
+		// create toShow 
+		cv::resize(l, l, cv::Size(500, 480.0 / (640.0 / 500.0)));
+		cv::resize(r, r, cv::Size(500, 480.0 / (640.0 / 500.0)));
+		cv::resize(disparity, disparity, cv::Size(500, 480.0 / (640.0 / 500.0)));
+		graph.copyTo(toShow(cv::Rect(0, shrinkHeight - 500, graph.cols, graph.rows))); 
+		l.copyTo(toShow(cv::Rect(0,0, l.cols, l.rows)));
+		r.copyTo(toShow(cv::Rect(500, 0, l.cols, l.rows)));
+		cvtColor(disparity, disparity, cv::COLOR_GRAY2RGB);
+		disparity.copyTo(toShow(cv::Rect(1000, 0, l.cols, l.rows)));
+		cv::rectangle(toShow, cv::Rect(0, 0, toShow.cols, toShow.rows), cv::Scalar(255, 255, 255), 3);
+		cv::rectangle(toShow, cv::Rect(500, 0, l.cols, l.rows), cv::Scalar(255, 255, 255), 3);
+		cv::rectangle(toShow, cv::Rect(1000, 0, l.cols, l.rows), cv::Scalar(255, 255, 255), 3);
+		cv::rectangle(toShow, cv::Rect(0, 0, l.cols, l.rows), cv::Scalar(255, 255, 255), 3);
+		cv::rectangle(toShow, cv::Rect(0, shrinkHeight, graph.cols, graph.rows), cv::Scalar(255, 255, 255), 3);
+		/*cv::imshow("graph", graph);
 		cv::imshow("ld", l);
-		cv::imshow("rd", r);
+		cv::imshow("rd", r);*/
 		//cv::imshow("l", l);
 		//cv::imshow("r", r);
 		cv::normalize(disparity, disparity, 0, 1, cv::NORM_MINMAX);
-		cv::imshow("disp", disparity);
+		cv::imshow("Breath detection", toShow);
 
 		if (cv::waitKey(1) == 27) break;
 	}
