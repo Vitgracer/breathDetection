@@ -3,7 +3,7 @@
 #define WIDTH 640	
 #define HEIGHT 480
 #define SQUARE (WIDTH * HEIGHT)
-#define DISP_MAX 150
+#define DISP_MAX 80
 #define DISP_MIN 0
 #define DIFF (DISP_MAX - DISP_MIN)
 
