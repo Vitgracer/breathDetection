@@ -37,6 +37,7 @@ int main() {
 	cv::Point start = cv::Point(0, 0);
 
 	std::vector<cv::Point> sumValues;
+	int breathNumber = 0;
 
 	while (true) {
 		counter++;
@@ -78,7 +79,14 @@ int main() {
 					break;
 				}
 			}
-			if (drawPoint) cv::circle(graph, sumValues[sumValues.size() - 5], 4, cv::Scalar(0, 0, 255), -1);
+			if (drawPoint) {
+				breathNumber++;
+				cv::circle(graph, sumValues[sumValues.size() - 5], 4, cv::Scalar(0, 0, 255), -1);
+				cv::String breathText= "Breaths: " + std::to_string(breathNumber);
+				cv::String breathTextErase = "Breaths: " + std::to_string(breathNumber - 1);
+				cv::putText(graph, breathTextErase, cv::Point(1100, 50), 2, 2, cv::Scalar(0, 0, 0));
+				cv::putText(graph, breathText, cv::Point(1100, 50), 2, 2, cv::Scalar(255, 0, 255));
+			}
 		}
 
 		cv::line(graph, start, end, cv::Scalar(255, 255, 255));
