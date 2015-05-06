@@ -35,6 +35,9 @@ int main() {
 	int i = 0;
 	int counter = 0;
 	cv::Point start = cv::Point(0, 0);
+
+	std::vector<cv::Point> sumValues;
+
 	while (true) {
 		counter++;
 		cv::Mat l;
@@ -43,7 +46,7 @@ int main() {
 		capR >> r;
 		if (l.empty()) break;
 
-		if (counter < 170) continue;
+		if (counter < 180) continue;
 		i+= 2;
 
 		cv::resize(l, l, cv::Size(WIDTH, HEIGHT));
@@ -63,6 +66,21 @@ int main() {
 		int yVal = (sum - minDiap) * 500 / (maxDiap - minDiap);
 
 		cv::Point end = cv::Point(i, 500 - yVal);
+
+		sumValues.push_back(end);
+
+		// red circles 
+		if (sumValues.size() > 10) {
+			bool drawPoint = true;
+			for (int sumC = -5; sumC < 5; sumC++) {
+				if (sumValues[sumValues.size() - 5].y > sumValues[sumValues.size() - 5 + sumC].y) {
+					drawPoint = false; 
+					break;
+				}
+			}
+			if (drawPoint) cv::circle(graph, sumValues[sumValues.size() - 5], 4, cv::Scalar(0, 0, 255), -1);
+		}
+
 		cv::line(graph, start, end, cv::Scalar(255, 255, 255));
 		start = end;
 
