@@ -28,7 +28,7 @@ int main() {
 
 	// prepare all opencl options 
 	engine._prepareOpenCL();
-	cv::Mat graph = cv::Mat(cv::Size(1500, 500), CV_8UC1);
+	cv::Mat graph = cv::Mat(cv::Size(1500, 500), CV_8UC3);
 	cv::rectangle(graph, cv::Rect(0, 0, 1500, 500), cv::Scalar(0), -1);
 	cv::VideoCapture capL("D:/MyDOC/Диплом/Результаты/6/l.avi");
 	cv::VideoCapture capR("D:/MyDOC/Диплом/Результаты/6/r.avi");
@@ -63,7 +63,7 @@ int main() {
 		int yVal = (sum - minDiap) * 500 / (maxDiap - minDiap);
 
 		cv::Point end = cv::Point(i, 500 - yVal);
-		cv::line(graph, start, end, cv::Scalar(255));
+		cv::line(graph, start, end, cv::Scalar(255, 255, 255));
 		start = end;
 
 		cv::imshow("graph", graph);
