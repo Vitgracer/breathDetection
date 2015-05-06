@@ -33,29 +33,36 @@ int main() {
 	cv::VideoCapture capL("D:/MyDOC/Диплом/Результаты/6/l.avi");
 	cv::VideoCapture capR("D:/MyDOC/Диплом/Результаты/6/r.avi");
 	int i = 0;
+	int counter = 0;
 	cv::Point start = cv::Point(0, 0);
 	while (true) {
-		i+= 2;
+		counter++;
 		cv::Mat l;
 		cv::Mat r;
 		capL >> l;
 		capR >> r;
+		if (l.empty()) break;
+
+		if (counter < 170) continue;
+		i+= 2;
+
 		cv::resize(l, l, cv::Size(WIDTH, HEIGHT));
 		cv::resize(r, r, cv::Size(WIDTH, HEIGHT));
 		if (!l.data) break;
 	
 		engine._calculateDisparity(l, r, &disparity);
-		cv::rectangle(disparity, cv::Rect(300, 200, 40, 80), cv::Scalar(255));
+		cv::Rect breathArea = cv::Rect(200, 200, 200, 80);
+		cv::rectangle(disparity, breathArea, cv::Scalar(128));
 
-		float sum = 0.0;
+		float sum = cv::sum(disparity(breathArea))[0] / breathArea.width / breathArea.height * 10;
+		std::cout << sum << "\n";
 
-		for (int i = 300; i < 340; i++) {
-			for (int j = 200; j < 280; j++) {
-				sum += disparity.at<float>(i,j);
-			}
-		}
-		std::cout << sum / 3200 << "\n";
-		cv::Point end = cv::Point(i, 500 - 500 * (sum / 3200 - 60) / (90 - 60));
+		int minDiap = 785;
+		int maxDiap = 810;
+		
+		int yVal = (sum - minDiap) * 500 / (maxDiap - minDiap);
+
+		cv::Point end = cv::Point(i, 500 - yVal);
 		cv::line(graph, start, end, cv::Scalar(255));
 		start = end;
 
